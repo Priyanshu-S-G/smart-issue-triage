@@ -1,0 +1,2 @@
+This folder is reserved for small shared UI primitives (e.g. Button, Badge)
+if the component library grows. Not needed for the current scope.
