@@ -11,6 +11,7 @@ export const KEYWORD_RULES: KeywordRule[] = [
     category: "bug",
     owner: "backend",
     weight: 5,
+    priorityBoost: 2,
     reason: "Application crash indicates a software bug."
   },
   {
@@ -32,6 +33,7 @@ export const KEYWORD_RULES: KeywordRule[] = [
     category: "bug",
     owner: "frontend",
     weight: 3,
+    effortHint: "small",
     reason: "UI button issue detected."
   },
   {
@@ -39,6 +41,7 @@ export const KEYWORD_RULES: KeywordRule[] = [
     category: "bug",
     owner: "frontend",
     weight: 4,
+    effortHint: "small",
     reason: "Layout/alignment issue detected."
   },
   {
@@ -71,6 +74,7 @@ export const KEYWORD_RULES: KeywordRule[] = [
     category: "security",
     owner: "security",
     weight: 8,
+    priorityBoost: 5,
     reason: "JWT exposure is a security concern."
   },
   {
@@ -78,6 +82,7 @@ export const KEYWORD_RULES: KeywordRule[] = [
     category: "security",
     owner: "security",
     weight: 7,
+    priorityBoost: 4,
     reason: "Sensitive token detected."
   },
   {
@@ -85,6 +90,8 @@ export const KEYWORD_RULES: KeywordRule[] = [
     category: "security",
     owner: "security",
     weight: 8,
+    priorityBoost: 3,
+    effortHint: "large",
     reason: "Unauthorized access indicates a security issue."
   },
   {
@@ -92,6 +99,7 @@ export const KEYWORD_RULES: KeywordRule[] = [
     category: "security",
     owner: "security",
     weight: 8,
+    priorityBoost: 4,
     reason: "Password exposure is a security issue."
   },
   {
@@ -99,6 +107,7 @@ export const KEYWORD_RULES: KeywordRule[] = [
     category: "security",
     owner: "security",
     weight: 8,
+    priorityBoost: 3,
     reason: "Authorization issue detected."
   },
   {
@@ -106,6 +115,7 @@ export const KEYWORD_RULES: KeywordRule[] = [
     category: "security",
     owner: "security",
     weight: 7,
+    priorityBoost: 3,
     reason: "Permission issue detected."
   },
   {
@@ -113,6 +123,7 @@ export const KEYWORD_RULES: KeywordRule[] = [
     category: "security",
     owner: "security",
     weight: 10,
+    priorityBoost: 5,
     reason: "SQL injection vulnerability detected."
   },
   {
@@ -120,6 +131,7 @@ export const KEYWORD_RULES: KeywordRule[] = [
     category: "security",
     owner: "security",
     weight: 10,
+    priorityBoost: 5,
     reason: "Cross-site scripting vulnerability detected."
   },
   {
@@ -127,6 +139,7 @@ export const KEYWORD_RULES: KeywordRule[] = [
     category: "security",
     owner: "security",
     weight: 8,
+    priorityBoost: 4,
     reason: "Sensitive information leak detected."
   },
 
@@ -152,6 +165,7 @@ export const KEYWORD_RULES: KeywordRule[] = [
     category: "performance",
     owner: "backend",
     weight: 6,
+    priorityBoost: 2,
     reason: "Response time degradation detected."
   },
   {
@@ -177,6 +191,7 @@ export const KEYWORD_RULES: KeywordRule[] = [
     category: "feature",
     owner: "frontend",
     weight: 6,
+    priorityBoost: 2,
     reason: "Dark mode is a frontend feature request."
   },
 
@@ -188,6 +203,7 @@ export const KEYWORD_RULES: KeywordRule[] = [
     category: "documentation",
     owner: "product",
     weight: 6,
+    effortHint: "small",
     reason: "Documentation-related request detected."
   },
   {
@@ -195,6 +211,7 @@ export const KEYWORD_RULES: KeywordRule[] = [
     category: "documentation",
     owner: "product",
     weight: 5,
+    effortHint: "small",
     reason: "README change requested."
   },
   {
@@ -202,6 +219,7 @@ export const KEYWORD_RULES: KeywordRule[] = [
     category: "documentation",
     owner: "product",
     weight: 4,
+    effortHint: "small",
     reason: "Typographical error in documentation."
   },
   {
@@ -209,6 +227,7 @@ export const KEYWORD_RULES: KeywordRule[] = [
     category: "documentation",
     owner: "product",
     weight: 5,
+    effortHint: "small",
     reason: "Docker documentation requested."
   },
 
@@ -229,8 +248,11 @@ export const KEYWORD_RULES: KeywordRule[] = [
   },
   {
     keyword: "accuracy",
+    category: "performance",
     owner: "ai-ml",
     weight: 6,
+    priorityBoost: 2,
+    effortHint: "large",
     reason: "Model accuracy issue detected."
   },
   {
@@ -239,7 +261,10 @@ export const KEYWORD_RULES: KeywordRule[] = [
     weight: 4,
     reason: "Data import referenced."
   },
+  
+  // ==========================
   // Business-critical flows
+  // ==========================
   {
     keyword: "payment",
     category: "bug",
