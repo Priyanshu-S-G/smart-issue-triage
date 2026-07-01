@@ -4,7 +4,7 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)
 ![Vitest](https://img.shields.io/badge/Tested-Vitest-6E9F18?logo=vitest)
 ![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)
-![Repo Size](https://img.shields.io/github/repo-size/<Priyanshu-S-G>/<smart-issue-triage>)
+![Repo Size](https://img.shields.io/github/repo-size/Priyanshu-S-G/smart-issue-triage)
 
 A small full-stack app that accepts a software issue report and automatically
 classifies it into a **category**, **priority**, **estimated effort**, and
