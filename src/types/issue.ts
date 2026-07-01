@@ -34,7 +34,7 @@ export type Owner =
 export interface IssueInput {
   title: string;
   description: string;
-  module?: string;
+  module: string;
   impact: Impact;
   reproducible: Reproducible;
   logs?: string;
@@ -54,6 +54,9 @@ export interface KeywordRule {
 
   category?: Category;
   owner?: Owner;
+
+  priorityBoost?: number;
+  effortHint?: Effort;
 
   weight: number;
 
