@@ -1,9 +1,24 @@
 # Smart Issue Triage
 
+![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)
+![Vitest](https://img.shields.io/badge/Tested-Vitest-6E9F18?logo=vitest)
+![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)
+![Repo Size](https://img.shields.io/github/repo-size/<Priyanshu-S-G>/<smart-issue-triage>)
+
 A small full-stack app that accepts a software issue report and automatically
 classifies it into a **category**, **priority**, **estimated effort**, and
 **suggested owner**, using a local, rule-based scoring engine (no paid AI API
 required).
+
+## Features
+
+- Deterministic rule-based issue classification
+- Confidence scoring with human-readable reasoning
+- Input validation with clear error messages
+- Session-based issue history
+- REST API (`POST /api/triage`)
+- Comprehensive unit tests using Vitest
 
 ## Setup
 
@@ -141,7 +156,7 @@ smart-issue-triage/
 { "error": "Request body must be valid JSON." }
 ```
 
-## AI / Triage Logic Explanation
+## Triage Logic Explanation
 
 The triage engine (`src/lib/triage/`) is a deterministic, rule-based scoring
 system — no external model calls, so it's free, fast, and fully testable:
@@ -201,81 +216,71 @@ HTTP layer.
 
 **1. How did you decide category, priority, effort, and owner from
 unstructured text?**
-By combining weighted keyword matches (which vote for category and owner)
-with structured signals already present in the form — `impact`,
-`reproducible`, and `module` — which vote for priority and confidence. Text
-signals and structured signals are combined additively rather than one
-overriding the other, so a "minor" impact issue that mentions `sql
+By using Rule-based weighted scoring, where keywords contribute weighted
+scores for `category` and `owner`, while `impact` level and `module`
+increase priority. Certain keywords suggest effort. Text signals and 
+structured signals are combined additively rather than one overriding
+the other, so a "minor" impact issue that mentions `sql
 injection` can still be escalated by keyword weight.
 
 **2. What edge cases can break your classifier?**
-Negated statements ("not a security issue"), issues that legitimately span
-multiple categories with roughly equal keyword weight (ties resolve
-arbitrarily to whichever appears first in scoring), very short but
-information-dense reports, and text in a language other than English (no
-keywords will match, so everything falls back to `other`/`product` with low
-confidence).
+Negated statements ("not a security issue"), issues with multiple 
+categories with roughly equal keyword weight creates issues in scoring
+since the higher score wins, very short but information-dense reports, and
+text in a language other than English as no keyword will match.
 
 **3. If this system used a real LLM API, how would you prevent hallucinated
 outputs?**
-Constrain the output with a strict JSON schema and reject/repair responses
-that don't validate against the allowed enum values; use low temperature;
-cross-check the LLM's category/priority against the same keyword heuristics
-as a sanity filter; and always show the reasoning so a human can catch
-obviously wrong output before it's acted on.
+Forcing the LLM to return a strict JSON format with only the allowed enum 
+values, use low temperature for consistent outputs, cross-check the LLM's
+result against the existing keyword rules as a sanity check, and show the
+reasoning so wrong classifications are easy to spot.
 
 **4. How would you make the API safe from prompt injection or malicious
 user input?**
-Treat all submitted text as untrusted data, never as instructions — if an
-LLM were involved, submitted text would be passed only inside a clearly
-delimited "user content" field, never concatenated into the system prompt.
-On the current rule-based system, the main risk is oversized payloads or
-malformed JSON, which the route already rejects with a 400.
+Treating all submitted text as untrusted data, not as instructions. If an LLM
+is used, keep user input separate from the system prompt and not be
+concatenated into the system prompt. In the current rule-based system, the
+main risk is oversized requests or malformed JSON, so they should be
+validated and rejected before reaching the classifier.
 
 **5. How would you measure whether the triage engine is accurate?**
-Build a labeled test set of real (or realistic) issues with agreed-upon
-correct category/priority/owner/effort, run the classifier against it, and
-track precision/recall per category plus a priority-distance metric (since
-priority is ordinal, being one bucket off is a smaller error than being
-three off). Track this over time as keyword rules change.
+Creating a labeled dataset with the expected category, priority, owner, and
+effort, then compare the classifier's output against it. Track 
+precision/recall per category plus a priority-distance metric. Track this
+over time as keyword rules change.
 
 **6. If 10,000 issues are submitted per day, what changes would you make in
 backend design?**
-Move classification off the request path into a queue/worker so submission
-returns immediately; add a real database instead of sessionStorage;
-introduce caching/rate limiting on the API; and consider batching or
-horizontal scaling of the classification workers if the engine grows more
-expensive (e.g. if it becomes embedding-based).
+If we move the classification to background work then users don't have to wait
+for it to finish. Replacing sessionStorage with a real database, add rate
+limiting to prevent abuse and consider batching or horizontal scaling of the
+classification workers if the engine grows more expensive.
 
 **7. What should be stored in a database, and what should not be stored for
 privacy reasons?**
-Store the issue title, description, module, impact, reproducible status,
-classification result, and timestamps. Avoid storing raw logs/stack traces
-long-term without redaction, since they can contain tokens, PII, or internal
-URLs; if logs must be kept, they should be scrubbed or stored with strict
-access controls and a retention limit.
+Issue title, description, module, impact, reproducible status,
+classification result, and timestamps should be stored in database. Avoiding
+storing sensitive information like passwords, tokens, or full logs unless
+they're cleaned first. And If logs must be kept, they should be scrubbed or
+stored with strict access controls and a retention limit.
 
 **8. How would you design confidence scoring?**
-Confidence should reflect how much signal the input actually contained: more
-keyword matches and more structured detail (title/description length,
-reproducibility) should raise it; ambiguity (very short or very vague text,
-conflicting signals, `unknown` reproducibility) should lower it. It should
-always be bounded to a known range and should be treated as a soft ranking
-signal, not a probability guarantee, unless it's calibrated against labeled
-data.
+Confidence should increase when more keyword rules match and the issue has
+enough useful information, like a detailed description or reproducible steps.
+It should decrease for vague descriptions and conflicting/unmatching signals.
+The score should always stay between 0 and 1 and as such be treated as an
+indicator, not a guarantee.
 
 **9. What is the difference between a deterministic rule-based classifier
 and an LLM-based classifier?**
-A rule-based classifier is fully transparent, deterministic, and cheap to
-run and test — the same input always gives the same output, and every
-decision can be traced back to a specific rule. An LLM-based classifier can
-generalize to phrasing the rules never anticipated, but is probabilistic,
-harder to test exhaustively, costs money/latency per call, and can
-hallucinate or drift between calls unless carefully constrained.
+A rule-based classifier is predictable since the same input always gives the
+same output, making it easier to understand, test, and debug, but has limited
+scope in real world applications. An LLM-based classifier can understand context
+and different ways of phrasing the same issue, but it costs more to run and can
+sometimes produce inconsistent results due to hallucinations.
 
 **10. How would you improve the UI for a real engineering team?**
-Add filtering/sorting to the history table, bulk actions (assign, re-triage,
-export), a way to correct a classification and feed that correction back
-into the rules, links from an issue straight into the relevant tracker
-(Jira/Linear), and a dashboard view of triage volume by category/priority
-over time.
+Add filtering and sorting to make issues easier to find, allow users to correct
+incorrect classifications, integrate with tools like Jira or GitHub, and add a
+dashboard showing trends such as issue volume, priority, and category over time.
