@@ -53,6 +53,10 @@ Runs the Vitest suite covering validation, classification, and the API route
 (success and invalid-input cases). Use `npm run test:watch` for watch mode.
 No API keys are required for tests to run.
 
+## Demo
+
+![Application Demo](docs/demo.gif)
+
 ## Tech Stack
 
 - **Next.js 14** (App Router) with **TypeScript**
